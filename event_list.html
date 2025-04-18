@@ -266,6 +266,7 @@ ${formattedClipboardText}
             rows.forEach(row => {
                 const inputs = row.querySelectorAll('input');
                 const eventName = inputs[0].value.trim();
+                const duration = inputs[1].value.trim(); // Get the duration value
                 const eventEmoji = getEventEmoji(eventName); // Get the emoji for the event name
 
                 // Convert Start Date and Time to Unix timestamp
@@ -286,7 +287,7 @@ ${formattedClipboardText}
 
                 // Format the row as requested
                 if (startDateTime && endDateTime && eventName) {
-                    previewText += `<t:${startDateTime}:f> [-](https://discord.gg/monopolygo) ${eventEmoji} **${eventName}** [-](https://discord.gg/monopolygo) [-](https://discord.gg/monopolygo) Claim Before [-](https://discord.gg/monopolygo) ${endTag}\n`;
+                    previewText += `<t:${startDateTime}:f> [-](https://discord.gg/monopolygo) ${eventEmoji} **${eventName}** [-](https://discord.gg/monopolygo) ${duration} [-](https://discord.gg/monopolygo) Claim Before [-](https://discord.gg/monopolygo) ${endTag}\n`;
                 }
             });
 
