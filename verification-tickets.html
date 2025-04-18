@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Tickets</title>
+    <style>
+        body {
+            padding-top: 70px;
+            padding-bottom: 170px;
+            background-color: #313338;
+            font-family: 'gg-sans', sans-serif;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #313338;
+            text-align: center;
+            padding: 0px;
+        }
+        .container {
+            text-align: center;
+            margin: 20px;
+        }
+        .copyTextContainer {
+            width: 300px;
+            margin: 0 auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin-bottom: 0px;
+        }
+        .label {
+            position: relative;
+            top: 30px;
+            left: 10px;
+            text-align: left;
+            font-weight: bold;
+            padding-bottom: 5px;
+        }
+        .texts {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            width: 280px;
+            margin: 0 auto;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            left: 10px;
+        }
+        .button:hover {
+            background-color: #3572c9;
+        }
+        .copyText {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            background-color: #1e1f22;
+            color: #777a82;
+            border: none;
+        }
+        .copyButton {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #5865f2; 
+            color: white; 
+            border: none; 
+            outline: none; 
+            border-radius: 5px;
+        }
+        .back-button,
+        .home-button {
+            padding: 6px;
+            font-family: 'ggsansSemibold', sans-serif;
+            font-size: 14px;
+            width: 200px;
+            text-align: center;
+            background-color: rgb(34, 30, 32);
+            color: #777a82;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); 
+        }
+        .command {
+            position:relative;
+            top: 130px;
+            left: 120px;
+            padding: 10px;
+            font-family:  'Courier New', Courier, monospace;
+            font-size: 12px;
+            width: 110px;
+            text-align: center;
+            background-color: #494949;
+            color: #e2e2e2;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            right: 0; /
+        }
+        text {
+            font-family:  'Courier New', Courier, monospace;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Verification Tickets</h1>
+        <h5>MONOPOLY GO Trading</h5>
+        <a href="support-index.html" class="back-button">Back</a>
+        <a href="index.html" class="back-button">Home</a>
+    </header>
+    <br><br>
+    <div class="texts">
+        - Introduce yourself and send the intro messege.
+       </div>
+    <div class="copyTextContainer">
+        <label class="label">VERIFY WELCOME MESSAGE</label>
+        <button id="copyCommand8" class="command" onclick="CommandsCopy(8)">verify-intro</button>
+        <textarea id="verify-intro" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('verify-intro')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">HOW TO VERIFY</label>
+        <button id="copyCommand3" class="command" onclick="CommandsCopy(3)">verify-howto</button>
+        <textarea id="verify-howto" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('verify-howto')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">VERIFY WITH /PANEL</label>
+        <button id="copyCommand4" class="command" onclick="CommandsCopy(4)">panel</button>
+        <textarea id="panel" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('panel')">Copy</button>
+    </div>
+    <br><br>
+    <div class="texts">
+        - if they are being blocked by another account<br><br>
+        - ask them to give the username of account & what the link is (family, alt, friend)<br><br>
+
+        - Check the other account (searching to make sure all is ok)<br><br>
+        - also double check the account matches up to the one that is blocking member
+        - If all checks are done & all is valid- please @Admin to manually verify<br><br>
+        - use command /add note to add a note to the member being verified <br><br>
+        - linked account (name of other account) reference (ticket number)<br><br>
+        - Also add for the other account too<br><br>
+        - If the linked account is an alt do not need to ban- only kick unless the alt was hacked- then request a ban
+       </div>
+    <!-- <div class="copyTextContainer">
+        <label class="label">BLOCKED DUE TO VPN</label>
+        <button id="copyCommand14" class="command" onclick="CommandsCopy(14)">vpn-ios</button>
+        <textarea id="vpn-ios" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('vpn-ios')">Copy</button>
+    </div> -->
+    <script src="script.js"></script>
+    
+    <script>
+    function copyToClipboard(id) {
+        const copyText = document.getElementById(id);
+        if (copyText) {
+            copyText.select();
+            document.execCommand("copy");
+        }
+    }   
+    function CommandsCopy(index) {
+        const copyCommand = document.getElementById(`copyCommand${index}`);
+        const commandText = copyCommand.innerText || copyCommand.textContent;
+        const tempTextarea = document.createElement("textarea");
+            tempTextarea.value = commandText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextarea);
+    }
+
+    </script> 
+</body>
+<header>
+    <br><br><br>
+    <a href="support-index.html" class="back-button">Back</a>
+    <a href="index.html" class="back-button">Home</a>
+</header>
+</html>

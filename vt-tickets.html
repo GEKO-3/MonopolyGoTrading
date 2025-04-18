@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VT / VGT Tickets</title>
+    <style>
+        body {
+            padding-top: 70px;
+            padding-bottom: 170px;
+            background-color: #313338;
+            font-family: 'gg-sans', sans-serif;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #313338;
+            text-align: center;
+            padding: 0px;
+        }
+        .container {
+            text-align: center;
+            margin: 20px;
+        }
+        .copyTextContainer {
+            width: 300px;
+            margin: 0 auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin-bottom: 0px;
+        }
+        .label {
+            position: relative;
+            top: 30px;
+            left: 10px;
+            text-align: left;
+            font-weight: bold;
+            padding-bottom: 5px;
+        }
+        .texts {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            width: 280px;
+            margin: 0 auto;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            left: 10px;
+        }
+        .button:hover {
+            background-color: #3572c9;
+        }
+        .copyText {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            background-color: #1e1f22;
+            color: #777a82;
+            border: none;
+        }
+        .copyButton {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #5865f2; 
+            color: white; 
+            border: none; 
+            outline: none; 
+            border-radius: 5px;
+        }
+        .back-button,
+        .home-button {
+            padding: 6px;
+            font-family: 'ggsansSemibold', sans-serif;
+            font-size: 14px;
+            width: 200px;
+            text-align: center;
+            background-color: rgb(34, 30, 32);
+            color: #777a82;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); 
+        }
+        .command {
+            position:relative;
+            top: 130px;
+            left: 120px;
+            padding: 10px;
+            font-family:  'Courier New', Courier, monospace;
+            font-size: 12px;
+            width: 110px;
+            text-align: center;
+            background-color: #494949;
+            color: #e2e2e2;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            right: 0; /
+        }
+        text {
+            font-family:  'Courier New', Courier, monospace;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>VT / VGT Tickets</h1>
+        <h5>MONOPOLY GO Trading</h5>
+        <a href="support-index.html" class="back-button">Back</a>
+        <a href="index.html" class="back-button">Home</a>
+    </header>
+    <br><br>
+    <div class="texts">
+        - when you see a new VT/TGT ticket, before saying or doing anything check if the applicant has a note or a warning. If you see any, report to Support Team Managers<br><br>
+        - If all seems good, proceed by sending the intro message below.<br><br>
+        - NOTE: For Verified Partner, use "vp-intro". For Trusted Carry Partner, use "tcp-intro".
+       </div>
+    <div class="copyTextContainer">
+        <label class="label">VT TICKET INTRO</label>
+        <button id="copyCommand8" class="command" onclick="CommandsCopy(8)">vt-intro</button>
+        <textarea id="vt-intro" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('vt-intro')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">TGT TICKET INTRO</label>
+        <button id="copyCommand9" class="command" onclick="CommandsCopy(9)">tgt-intro</button>
+        <textarea id="tgt-intro" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('tgt-intro')">Copy</button>
+    </div>
+    <br><br>
+    <div class="texts">
+        - after that, immedietly check the Rep of the applican by using /rep command.<br><br>
+        - if they do not have the required amount of Rep, send them the NOT ENOUGH REP messege, of the respective type.
+       </div>
+    <div class="copyTextContainer">
+        <label class="label">VT NOT ENOUGH REP</label>
+        <button id="copyCommand3" class="command" onclick="CommandsCopy(3)">vt-void</button>
+        <textarea id="vt-void" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('vt-void')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">TGT NOT ENOUGH REP</label>
+        <button id="copyCommand4" class="command" onclick="CommandsCopy(4)">tgt-void</button>
+        <textarea id="tgt-void" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('tgt-void')">Copy</button>
+    </div>
+    <br><br>
+    <div class="texts">
+        - Once the applicant has sent over all the Proof, you can go through and verify if all of them are $ or 5 star trades<br><br>
+        - After that check the Rep Log of the applicant in #|investigations channel, by using /replog command.<br><br>
+        - Make sure the Trades have been repped on the server, and check if there was any rep abuse, a few missing Rep on the trades is acceptable.
+       </div>
+    <div class="copyTextContainer">
+        <label class="label">VT SUCCESSFUL SUBMISSION</label>
+        <button id="copyCommand14" class="command" onclick="CommandsCopy(14)">vt-success</button>
+        <textarea id="vt-success" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('vt-success')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">TGT SUCCESSFUL SUBMISSION</label>
+        <button id="copyCommand1" class="command" onclick="CommandsCopy(1)">tgt-success</button>
+        <textarea id="tgt-success" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('tgt-success')">Copy</button>
+    </div>
+    <br><br>
+    <div class="texts">
+        - Send the closing text and make sure they agree with the terms.<br><br>
+        - NOTE: For Verified Partner, use "vp-close". For Trusted Carry Partner, use "tcp-close".
+       </div>
+    <div class="copyTextContainer">
+        <label class="label">VT CLOSE NOTE</label>
+        <button id="copyCommand6" class="command" onclick="CommandsCopy(6)">vt-close</button>
+        <textarea id="vt-close" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('vt-close')">Copy</button>
+    </div>
+    <div class="copyTextContainer">
+        <label class="label">TGT CLOSE NOTE</label>
+        <button id="copyCommand7" class="command" onclick="CommandsCopy(7)">tgt-close</button>
+        <textarea id="tgt-close" class="copyText" readonly></textarea>
+        <button class="copyButton" onclick="copyToClipboard('tgt-close')">Copy</button>
+    </div>
+    <br><br>
+    <div class="texts">
+        - You can go ahead and close the ticket if they agree, and don't have any more questions
+       </div>
+    <script src="script.js"></script>
+    
+    <script>
+    function copyToClipboard(id) {
+        const copyText = document.getElementById(id);
+        if (copyText) {
+            copyText.select();
+            document.execCommand("copy");
+        }
+    }   
+    function CommandsCopy(index) {
+        const copyCommand = document.getElementById(`copyCommand${index}`);
+        const commandText = copyCommand.innerText || copyCommand.textContent;
+        const tempTextarea = document.createElement("textarea");
+            tempTextarea.value = commandText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextarea);
+    }
+
+    </script> 
+</body>
+<header>
+    <br><br><br>
+    <a href="support-index.html" class="back-button">Back</a>
+    <a href="index.html" class="back-button">Home</a>
+</header>
+</html>

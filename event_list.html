@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <style>
+        /* Dark mode styles */
+        body {
+            background-color: #2c2f33; /* Discord dark background */
+            color: #ffffff; /* White text */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: flex-start; /* Align content to the top */
+            padding: 20px; /* Add padding around the content */
+        }
+        .container {
+            max-width: 800px; /* Limit the width of the content */
+            width: 100%; /* Ensure it takes full width on smaller screens */
+        }
+        h1 {
+            color: #ffffff; /* White text for headings */
+            text-align: center; /* Center align heading */
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+        }
+        .input-row input {
+            padding: 5px;
+            flex: 1;
+            background-color: #23272a; /* Discord input background */
+            color: #ffffff; /* White text */
+            border: 1px solid #7289da; /* Discord accent color */
+            border-radius: 5px;
+        }
+        .input-row input::placeholder {
+            color: #99aab5; /* Placeholder text color */
+        }
+        .input-row label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #99aab5; /* Lighter text for labels */
+        }
+        .add-button, .copy-button, .reset-button {
+            background-color: #7289da; /* Discord accent color */
+            color: #ffffff; /* White text */
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-button:hover, .copy-button:hover, .reset-button:hover {
+            background-color: #5b6eae; /* Darker accent on hover */
+        }
+        .preview-window {
+            margin-top: 20px;
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            background-color: #23272a; /* Discord input background */
+            color: #ffffff; /* White text */
+            border: 1px solid #7289da; /* Discord accent color */
+            resize: none;
+            border-radius: 5px;
+        }
+        .top-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+        }
+        input[type="date"], input[type="time"] {
+            background-color: #23272a; /* Discord input background */
+            color: #ffffff; /* White text */
+            border: 1px solid #7289da; /* Discord accent color */
+            border-radius: 5px;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1); /* Invert icon colors for dark mode */
+        }
+        .group-row {
+            display: flex;
+            gap: 10px;
+            flex: 1; /* Ensure equal spacing for grouped fields */
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .input-row {
+                flex-direction: column; /* Stack rows vertically on smaller screens */
+            }
+            .group-row {
+                flex-wrap: nowrap; /* Keep grouped fields in the same row */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Event List</h1>
+        <div class="top-controls">
+            <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="reset-button" onclick="resetForm()">Reset</button>
+            <input type="date" id="global-date" value="${new Date().toISOString().split('T')[0]}" onchange="onGlobalDateChange()">
+        </div>
+        <datalist id="event-suggestions">
+            <option value="Board Rush"></option>
+            <option value="Builder's Bash"></option>
+            <option value="Cash Boost"></option>
+            <option value="Cash Grab"></option>
+            <option value="Free Parking Cash"></option>
+            <option value="Free Parking Dice"></option>
+            <option value="Golden Blitz"></option>
+            <option value="High Roller"></option>
+            <option value="PEG-E"></option>
+            <option value="Treasures"></option>
+            <option value="Sticker Boom"></option>
+            <option value="Roll Match"></option>
+            <option value="Rent Frenzy"></option>
+            <option value="Mega Heist"></option>
+            <option value="Lucky Chance"></option>
+            <option value="Landmark Rush"></option>
+            <option value="Wheel Boost"></option>
+            <option value="Address Book Connect"></option>
+            <option value="Facebook Connect"></option>
+            <option value="Tycoon Racers"></option>
+        </datalist>
+        <div id="input-container">
+            <div class="input-row">
+                <div class="group-row">
+                    <div>
+                        <label for="event-name">Event Name</label>
+                        <input id="event-name" type="text" placeholder="EVENT NAME" list="event-suggestions" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="duration">Duration</label>
+                        <input id="duration" type="text" placeholder="DURATION" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="start-date">Start Date</label>
+                        <input id="start-date" type="date" placeholder="Start Date" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="start-time">Start Time</label>
+                        <input id="start-time" type="time" placeholder="Start Time" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="end-date">End Date</label>
+                        <input id="end-date" type="date" placeholder="End Date" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="end-time">End Time</label>
+                        <input id="end-time" type="time" placeholder="End Time" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="add-button" onclick="addRow()">+</button>
+        <textarea id="preview-window" class="preview-window" readonly placeholder="Preview of copied text will appear here..."></textarea>
+    </div>
+    <script>
+        function addRow() {
+            const container = document.getElementById('input-container');
+            const newRow = document.createElement('div');
+            const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+            newRow.className = 'input-row';
+            newRow.innerHTML = `
+                <div class="group-row">
+                    <div>
+                        <label for="event-name">Event Name</label>
+                        <input id="event-name" type="text" placeholder="EVENT NAME" list="event-suggestions" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="duration">Duration</label>
+                        <input id="duration" type="text" placeholder="DURATION" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="start-date">Start Date</label>
+                        <input id="start-date" type="date" placeholder="Start Date" value="${currentDate}" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="start-time">Start Time</label>
+                        <input id="start-time" type="time" placeholder="Start Time" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="end-date">End Date</label>
+                        <input id="end-date" type="date" placeholder="End Date" value="${currentDate}" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                    <div>
+                        <label for="end-time">End Time</label>
+                        <input id="end-time" type="time" placeholder="End Time" oninput="updatePreview(); saveDataToLocalStorage()">
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
+            updatePreview();
+            saveDataToLocalStorage(); // Save data after adding a new row
+        }
+
+        function copyToClipboard() {
+            const previewWindow = document.getElementById('preview-window');
+            const clipboardText = previewWindow.value;
+
+            // Get the global date and format it as M/D
+            const globalDate = document.getElementById('global-date').value;
+            const formattedDate = formatDateToMD(globalDate); // Use M/D format
+
+            // Add `>` to the beginning of every line in the copied text, excluding empty lines
+            const formattedClipboardText = clipboardText
+                .split('\n')
+                .filter(line => line.trim() !== '') // Remove empty lines
+                .map(line => `> ${line}`)
+                .join('\n');
+
+            // Wrap the copied text with the specified format
+            const wrappedText = `# __PREDICTED EVENTS :MGT_EventList: ${formattedDate}__
+@Event List Ping @All Events Ping
+
+*All times shown are already displayed in your own timezone.*
+${formattedClipboardText}
+**Disclaimer:** This may change but so far it’s been accurate from this source.`;
+
+            navigator.clipboard.writeText(wrappedText).catch(err => {
+                console.error('Failed to copy:', err); // Log error instead of showing alert
+            });
+        }
+
+        function getEventEmoji(eventName) {
+            const eventEmojis = {
+                "Board Rush": ":MGT_Event_BoardRush:",
+                "Builder's Bash": ":MGT_Event_BuildersBash:",
+                "Cash Boost": ":MGT_Event_CashBoost:",
+                "Cash Grab": ":MGT_Event_CashGrab:",
+                "Free Parking Cash": ":MGT_Event_FreeParkingCash:",
+                "Free Parking Dice": ":MGT_Event_FreeParkingDice:",
+                "Golden Blitz": ":MGT_Event_GoldenBlitz~1:",
+                "High Roller": ":MGT_Event_HighRoller_old:",
+                "PEG-E": ":MGT_Event_Sticker_PEG_E:",
+                "Treasures": ":MGT_Event_Sticker_EgyptTreasures:",
+                "Sticker Boom": ":MGT_Event_StickerBoom~1:",
+                "Roll Match": ":MGT_Event_RollMatch:",
+                "Rent Frenzy": ":MGT_Event_RentFrenzy:",
+                "Mega Heist": ":MGT_Event_MegaHeist:",
+                "Lucky Chance": ":MGT_Event_LuckyChance:",
+                "Landmark Rush": ":MGT_Event_LandmarkRush:",
+                "Wheel Boost": ":MGT_Event_WheelBoost:",
+                "Address Book Connect": ":card_index:",
+                "Facebook Connect": ":facebook:",
+                "Tycoon Racers": ":MGT_Event_TycoonRacers:"
+            };
+            return eventEmojis[eventName] || "";
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('input-container');
+            const rows = container.querySelectorAll('.input-row');
+            let previewText = '';
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const eventName = inputs[0].value.trim();
+                const eventEmoji = getEventEmoji(eventName); // Get the emoji for the event name
+
+                // Convert Start Date and Time to Unix timestamp
+                const startDate = inputs[2].value.trim();
+                const startTime = inputs[3].value.trim();
+                const startDateTime = startDate && startTime ? Math.floor(new Date(`${startDate}T${startTime}`).getTime() / 1000) : '';
+
+                // Convert End Date and Time to Unix timestamp
+                const endDate = inputs[4].value.trim();
+                const endTime = inputs[5].value.trim();
+                const endDateTime = endDate && endTime ? Math.floor(new Date(`${endDate}T${endTime}`).getTime() / 1000) : '';
+
+                // Determine the format for the end time
+                let endTag = `<t:${endDateTime}:f>`;
+                if (startDate === endDate) {
+                    endTag = `<t:${endDateTime}:t>`;
+                }
+
+                // Format the row as requested
+                if (startDateTime && endDateTime && eventName) {
+                    previewText += `<t:${startDateTime}:f> [-](https://discord.gg/monopolygo) ${eventEmoji} **${eventName}** [-](https://discord.gg/monopolygo) [-](https://discord.gg/monopolygo) Claim Before [-](https://discord.gg/monopolygo) ${endTag}\n`;
+                }
+            });
+
+            const previewWindow = document.getElementById('preview-window');
+            previewWindow.value = previewText; // Update the preview window
+        }
+
+        function saveDataToLocalStorage() {
+            const container = document.getElementById('input-container');
+            const rows = container.querySelectorAll('.input-row');
+            const data = [];
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const rowData = Array.from(inputs).map(input => input.value.trim());
+                data.push(rowData);
+            });
+
+            const currentDate = new Date().toISOString().split('T')[0];
+            localStorage.setItem('eventData', JSON.stringify(data));
+            localStorage.setItem('lastSavedDate', currentDate);
+        }
+
+        function loadDataFromLocalStorage() {
+            const savedDate = localStorage.getItem('lastSavedDate');
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            // Reset data if the date has changed
+            if (savedDate !== currentDate) {
+                localStorage.removeItem('eventData');
+                localStorage.setItem('lastSavedDate', currentDate);
+                return;
+            }
+
+            const savedData = JSON.parse(localStorage.getItem('eventData') || '[]');
+            const container = document.getElementById('input-container');
+            container.innerHTML = ''; // Clear existing rows
+
+            savedData.forEach(rowData => {
+                const newRow = document.createElement('div');
+                newRow.className = 'input-row';
+                newRow.innerHTML = `
+                    <div class="group-row">
+                        <div>
+                            <label for="event-name">Event Name</label>
+                            <input id="event-name" type="text" placeholder="EVENT NAME" value="${rowData[0]}" list="event-suggestions" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                        <div>
+                            <label for="duration">Duration</label>
+                            <input id="duration" type="text" placeholder="DURATION" value="${rowData[1]}" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                        <div>
+                            <label for="start-date">Start Date</label>
+                            <input id="start-date" type="date" placeholder="Start Date" value="${rowData[2]}" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                        <div>
+                            <label for="start-time">Start Time</label>
+                            <input id="start-time" type="time" placeholder="Start Time" value="${rowData[3]}" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                        <div>
+                            <label for="end-date">End Date</label>
+                            <input id="end-date" type="date" placeholder="End Date" value="${rowData[4]}" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                        <div>
+                            <label for="end-time">End Time</label>
+                            <input id="end-time" type="time" placeholder="End Time" value="${rowData[5]}" oninput="updatePreview(); saveDataToLocalStorage()">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newRow);
+            });
+
+            updatePreview();
+        }
+
+        function resetForm() {
+            // Clear all rows
+            const container = document.getElementById('input-container');
+            container.innerHTML = '';
+
+            // Add a single empty row
+            addRow();
+
+            // Clear local storage
+            localStorage.removeItem('eventData');
+            localStorage.removeItem('lastSavedDate');
+
+            // Reset the global date to today
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('global-date').value = currentDate;
+
+            // Update the preview
+            updatePreview();
+        }
+
+        function formatDateToMD(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${parseInt(month)}/${parseInt(day)}`; // Convert to M/D format
+        }
+
+        function onGlobalDateChange() {
+            const globalDate = document.getElementById('global-date').value;
+            const formattedDate = formatDateToMD(globalDate);
+            console.log(`Global date changed to: ${formattedDate}`); // Log the formatted date
+            // You can add additional logic here if needed.
+        }
+
+        // Load data from local storage on page load and set the global date to the current date in M/D format
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set the global date to the current date in M/D format by default
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('global-date').value = currentDate;
+            console.log(`Global date set to: ${formatDateToMD(currentDate)}`); // Log the formatted date
+
+            loadDataFromLocalStorage(); // Load data from local storage
+        });
+
+        // Set default dates for the initial row and update the preview
+        document.getElementById('start-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('end-date').value = new Date().toISOString().split('T')[0];
+        updatePreview();
+    </script>
+</body>
+</html>

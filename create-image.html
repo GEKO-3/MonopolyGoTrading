@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Image</title>
+    <style>
+        body {
+            background-color: #313338;
+            font-family: 'ggsansBold', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .sheet {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .sheet th, .sheet td {
+            border: 1px solid #5865f2;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .sheet th {
+            background-color: #484c70;
+        }
+
+        .sheet td {
+            background-color: #3a3d45;
+        }
+
+        .sheet input {
+            width: 100%;
+            padding: 5px;
+            font-family: 'ggsansSemibold', sans-serif;
+            font-size: 14px;
+            border: 1px solid #5865f2;
+            border-radius: 3px;
+            background-color: #484c70;
+            color: #fff;
+        }
+
+        .add-button {
+            margin: 20px 0;
+            padding: 10px 20px;
+            font-family: 'ggsansSemibold', sans-serif;
+            font-size: 16px;
+            background-color: #5865f2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: #3572c9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Image</h1>
+    <table class="sheet" id="inputSheet">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Reward</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Default 20 rows -->
+            <script>
+                for (let i = 1; i <= 20; i++) {
+                    document.write(`
+                        <tr>
+                            <td>${i}</td>
+                            <td><input type="text" placeholder="Enter reward"></td>
+                            <td><input type="text" placeholder="Enter points"></td>
+                        </tr>
+                    `);
+                }
+            </script>
+        </tbody>
+    </table>
+    <button class="add-button" onclick="addRow()">+ Add More Listings</button>
+
+    <script>
+        let rowCount = 20;
+
+        function addRow() {
+            rowCount++;
+            const tableBody = document.querySelector('#inputSheet tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="text" placeholder="Enter reward"></td>
+                <td><input type="text" placeholder="Enter points"></td>
+            `;
+            tableBody.appendChild(newRow);
+        }
+    </script>
+</body>
+</html>
