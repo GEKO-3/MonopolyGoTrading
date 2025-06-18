@@ -144,7 +144,7 @@
                 const amount = inputs[1].value.trim();
                 if (item && amount) {
                     const prefix = getItemPrefixText(item);
-                    previewText += `${prefix ? prefix + " " : ""}${item} [-](https://discord.gg/monopolygo) ${amount}\n`;
+                    previewText += `${prefix ? prefix + " " : ""}**${item}** [-](https://discord.gg/monopolygo) ${amount}\n`;
                 }
             });
             document.getElementById('preview-window').value = previewText;
