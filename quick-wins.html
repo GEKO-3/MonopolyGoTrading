@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Wins</title>
+    <style>
+        body {
+            background-color: #2c2f33;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #ffffff;
+            text-align: center;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .input-row input, .input-row select {
+            padding: 5px;
+            flex: 1;
+            background-color: #23272a;
+            color: #ffffff;
+            border: 1px solid #7289da;
+            border-radius: 5px;
+        }
+        .input-row input::placeholder {
+            color: #99aab5;
+        }
+        .add-button, .copy-button, .reset-button {
+            background-color: #7289da;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-button:hover, .copy-button:hover, .reset-button:hover {
+            background-color: #5b6eae;
+        }
+        .preview-window {
+            margin-top: 20px;
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            background-color: #23272a;
+            color: #ffffff;
+            border: 1px solid #7289da;
+            resize: none;
+            border-radius: 5px;
+        }
+        .top-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Wins</h1>
+        <div class="top-controls">
+            <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="reset-button" onclick="resetForm()">Reset</button>
+            <input type="date" id="quikwins-date" style="background-color:#23272a;color:#fff;border:1px solid #7289da;border-radius:5px;">
+        </div>
+        <datalist id="item-suggestions">
+            <option value="Collect Cash"></option>
+            <option value="Pass GO"></option>
+            <option value="Shut Down"></option>
+            <option value="Upgrade Landmarks"></option>
+            <option value="Bank Heist"></option>
+            <option value="Roll Doubles"></option>
+            <option value="Collect Stickers"></option>
+            <option value="Roll"></option>
+            <option value="Land on Chance"></option>
+            <option value="Land on Community Chest"></option>
+        </datalist>
+        <div id="input-container">
+            <div class="input-row">
+                <input type="text" placeholder="Task" list="item-suggestions" oninput="updatePreview(); saveDataToLocalStorage()">
+                <input type="text" placeholder="Amount" oninput="updatePreview(); saveDataToLocalStorage()">
+            </div>
+        </div>
+        <button class="add-button" onclick="addRow()">+</button>
+        <textarea id="preview-window" class="preview-window" readonly placeholder="Preview will appear here..."></textarea>
+    </div>
+    <script>
+        function addRow() {
+            const container = document.getElementById('input-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'input-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Select Item" list="item-suggestions" oninput="updatePreview(); saveDataToLocalStorage()">
+                <input type="text" placeholder="Amount" oninput="updatePreview(); saveDataToLocalStorage()">
+            `;
+            container.appendChild(newRow);
+            updatePreview();
+            saveDataToLocalStorage();
+        }
+
+        // Map item to custom text
+        function getItemPrefixText(item) {
+            const map = {
+                "Collect Cash": ":MGT_LargeHeistMoney:",
+                "Pass GO": ":go:",
+                "Shut Down": ":MGT_LandmarkShutdown:",
+                "Upgrade Landmarks": "🃏 Card:",
+                "Bank Heist": ":MGT_BankHeist:",
+                "Roll Doubles": "colordice:",
+                "Collect Stickers": ":StickersMGO:",
+                "Roll": ":MGT_Dice:",
+                "Land on Chance": "🔑 Token:",
+                "Land on Community Chest": ":communitychest:",
+            };
+            return map[item] || "";
+        }
+
+        function updatePreview() {
+            const container = document.getElementById('input-container');
+            const rows = container.querySelectorAll('.input-row');
+            let previewText = '';
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const item = inputs[0].value.trim();
+                const amount = inputs[1].value.trim();
+                if (item && amount) {
+                    const prefix = getItemPrefixText(item);
+                    previewText += `${prefix ? prefix + " " : ""}${item} [-](https://discord.gg/monopolygo) ${amount}\n`;
+                }
+            });
+            document.getElementById('preview-window').value = previewText;
+        }
+
+        function copyToClipboard() {
+            const previewWindow = document.getElementById('preview-window');
+            const clipboardText = previewWindow.value;
+            if (clipboardText.trim() === '') return;
+            // Get date from input field in M/D/YYYY format
+            const dateInput = document.getElementById('quikwins-date').value;
+            let formattedDate = '';
+            if (dateInput) {
+                const [year, month, day] = dateInput.split('-');
+                formattedDate = `${parseInt(month)}/${parseInt(day)}/${year}`;
+            }
+            const wrappedText = `# QUIKWINS ${formattedDate}\n${clipboardText}`;
+            navigator.clipboard.writeText(wrappedText).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        function saveDataToLocalStorage() {
+            const container = document.getElementById('input-container');
+            const rows = container.querySelectorAll('.input-row');
+            const data = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                data.push([inputs[0].value.trim(), inputs[1].value.trim()]);
+            });
+            localStorage.setItem('simpleListData', JSON.stringify(data));
+        }
+
+        function loadDataFromLocalStorage() {
+            const savedData = JSON.parse(localStorage.getItem('simpleListData') || '[]');
+            const container = document.getElementById('input-container');
+            container.innerHTML = '';
+            savedData.forEach(rowData => {
+                const newRow = document.createElement('div');
+                newRow.className = 'input-row';
+                newRow.innerHTML = `
+                    <input type="text" placeholder="Select Item" list="item-suggestions" value="${rowData[0] || ''}" oninput="updatePreview(); saveDataToLocalStorage()">
+                    <input type="text" placeholder="Amount" value="${rowData[1] || ''}" oninput="updatePreview(); saveDataToLocalStorage()">
+                `;
+                container.appendChild(newRow);
+            });
+            if (savedData.length === 0) addRow();
+            updatePreview();
+        }
+
+        function resetForm() {
+            const container = document.getElementById('input-container');
+            container.innerHTML = '';
+            addRow();
+            localStorage.removeItem('simpleListData');
+            updatePreview();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataFromLocalStorage();
+            // Set today's date as default for the date input
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('quikwins-date').value = `${yyyy}-${mm}-${dd}`;
+        });
+    </script>
+</body>
+</html>
