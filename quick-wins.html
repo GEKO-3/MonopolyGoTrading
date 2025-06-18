@@ -161,7 +161,7 @@
                 const [year, month, day] = dateInput.split('-');
                 formattedDate = `${parseInt(month)}/${parseInt(day)}/${year}`;
             }
-            const wrappedText = `# QUIKWINS ${formattedDate}\n${clipboardText}`;
+            const wrappedText = `# :MG_CardTick: QUICK WINS ${formattedDate}\n${clipboardText}`;
             navigator.clipboard.writeText(wrappedText).catch(err => {
                 console.error('Failed to copy:', err);
             });
