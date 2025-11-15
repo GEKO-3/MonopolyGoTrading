@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event List</title>
+    <script type="module" src="firebase-config.js"></script>
     <style>
         /* Dark mode styles */
         body {
@@ -90,6 +91,98 @@
             gap: 10px;
             flex: 1; /* Ensure equal spacing for grouped fields */
         }
+        .manage-events-button {
+            background-color: #43b581; /* Green accent color */
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .manage-events-button:hover {
+            background-color: #3ca374;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .modal-content {
+            background-color: #2c2f33;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #7289da;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            color: #ffffff;
+        }
+        .close {
+            color: #99aab5;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #ffffff;
+        }
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #23272a;
+            border-radius: 5px;
+        }
+        .delete-button {
+            background-color: #f04747;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #d84040;
+        }
+        .add-event-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #7289da;
+        }
+        .add-event-form input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #23272a;
+            color: #ffffff;
+            border: 1px solid #7289da;
+            border-radius: 5px;
+        }
+        .add-event-form button {
+            background-color: #43b581;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .add-event-form button:hover {
+            background-color: #3ca374;
+        }
+        #events-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
 
         /* Responsive styles */
         @media (max-width: 768px) {
@@ -108,31 +201,12 @@
         <div class="top-controls">
             <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
             <button class="reset-button" onclick="resetForm()">Reset</button>
-            <input type="date" id="global-date" value="${new Date().toISOString().split('T')[0]}" onchange="onGlobalDateChange()">
+            <button class="manage-events-button" onclick="openEventManager()">Manage Events</button>
+            <input type="date" id="global-date" onchange="onGlobalDateChange()">
         </div>
         <datalist id="event-suggestions">
-            <option value="Board Rush"></option>
-            <option value="Builder's Bash"></option>
-            <option value="Cash Boost"></option>
-            <option value="Cash Grab"></option>
-            <option value="Free Parking Cash"></option>
-            <option value="Free Parking Dice"></option>
-            <option value="Golden Blitz"></option>
-            <option value="High Roller"></option>
-            <option value="PEG-E"></option>
-            <option value="Treasures"></option>
-            <option value="Sticker Boom"></option>
-            <option value="Roll Match"></option>
-            <option value="Rent Frenzy"></option>
-            <option value="Mega Heist"></option>
-            <option value="Lucky Chance"></option>
-            <option value="Landmark Rush"></option>
-            <option value="Wheel Boost"></option>
-            <option value="Address Book Connect"></option>
-            <option value="Facebook Connect"></option>
-            <option value="Tycoon Racers"></option>
-            <option value="Juggle Sort"></option>
-            </datalist>
+            <!-- Events will be loaded from Firebase -->
+        </datalist>
         <div id="input-container">
             <div class="input-row">
                 <div class="group-row">
@@ -166,7 +240,132 @@
         <button class="add-button" onclick="addRow()">+</button>
         <textarea id="preview-window" class="preview-window" readonly placeholder="Preview of copied text will appear here..."></textarea>
     </div>
-    <script>
+
+    <!-- Modal for managing events -->
+    <div id="event-manager-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEventManager()">&times;</span>
+            <h2>Manage Events</h2>
+            <div id="events-list">
+                <!-- Events will be loaded here -->
+            </div>
+            <div class="add-event-form">
+                <h3>Add New Event</h3>
+                <input type="text" id="new-event-name" placeholder="Event Name" />
+                <input type="text" id="new-event-emoji" placeholder="Event Emoji (optional, e.g., :MGT_Event_Name:)" />
+                <button onclick="addNewEvent()">Add Event</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadEventsFromFirebase, addEventToFirebase, removeEventFromFirebase, initializeDefaultEvents } from './firebase-config.js';
+
+        // Global variable to store events with emojis
+        let eventsData = {};
+
+        // Initialize Firebase events on page load
+        initializeDefaultEvents();
+
+        // Load events from Firebase and populate datalist
+        function loadEvents() {
+            loadEventsFromFirebase((events) => {
+                const datalist = document.getElementById('event-suggestions');
+                datalist.innerHTML = ''; // Clear existing options
+                eventsData = {}; // Reset events data
+
+                events.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event.name;
+                    datalist.appendChild(option);
+                    eventsData[event.name] = event.emoji; // Store emoji mapping
+                });
+
+                updatePreview(); // Update preview after loading events
+            });
+        }
+
+        // Open event manager modal
+        window.openEventManager = function() {
+            const modal = document.getElementById('event-manager-modal');
+            modal.style.display = 'block';
+            refreshEventsList();
+        };
+
+        // Close event manager modal
+        window.closeEventManager = function() {
+            const modal = document.getElementById('event-manager-modal');
+            modal.style.display = 'none';
+        };
+
+        // Refresh the events list in the modal
+        function refreshEventsList() {
+            loadEventsFromFirebase((events) => {
+                const eventsList = document.getElementById('events-list');
+                eventsList.innerHTML = '';
+
+                events.sort((a, b) => a.name.localeCompare(b.name));
+
+                events.forEach(event => {
+                    const eventItem = document.createElement('div');
+                    eventItem.className = 'event-item';
+                    eventItem.innerHTML = `
+                        <span>${event.name} ${event.emoji ? '(' + event.emoji + ')' : ''}</span>
+                        <button class="delete-button" onclick="deleteEvent('${event.id}')">Delete</button>
+                    `;
+                    eventsList.appendChild(eventItem);
+                });
+            });
+        }
+
+        // Add new event to Firebase
+        window.addNewEvent = async function() {
+            const eventName = document.getElementById('new-event-name').value.trim();
+            const eventEmoji = document.getElementById('new-event-emoji').value.trim();
+
+            if (!eventName) {
+                alert('Please enter an event name');
+                return;
+            }
+
+            try {
+                await addEventToFirebase(eventName, eventEmoji);
+                document.getElementById('new-event-name').value = '';
+                document.getElementById('new-event-emoji').value = '';
+                refreshEventsList();
+                loadEvents(); // Reload the datalist
+                alert('Event added successfully!');
+            } catch (error) {
+                console.error('Error adding event:', error);
+                alert('Failed to add event. Please try again.');
+            }
+        };
+
+        // Delete event from Firebase
+        window.deleteEvent = async function(eventId) {
+            if (!confirm('Are you sure you want to delete this event?')) {
+                return;
+            }
+
+            try {
+                await removeEventFromFirebase(eventId);
+                refreshEventsList();
+                loadEvents(); // Reload the datalist
+                alert('Event deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting event:', error);
+                alert('Failed to delete event. Please try again.');
+            }
+        };
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('event-manager-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
         function addRow() {
             const container = document.getElementById('input-container');
             const newRow = document.createElement('div');
@@ -234,30 +433,8 @@ ${formattedClipboardText}
         }
 
         function getEventEmoji(eventName) {
-            const eventEmojis = {
-                "Board Rush": ":MGT_Event_BoardRush:",
-                "Builder's Bash": ":MGT_Event_BuildersBash:",
-                "Cash Boost": ":MGT_Event_CashBoost:",
-                "Cash Grab": ":MGT_Event_CashGrab:",
-                "Free Parking Cash": ":MGT_Event_FreeParkingCash:",
-                "Free Parking Dice": ":MGT_Event_FreeParkingDice:",
-                "Golden Blitz": ":MGT_Event_GoldenBlitz~1:",
-                "High Roller": ":MGT_Event_HighRoller_old:",
-                "PEG-E": ":MGT_Event_Sticker_PEG_E:",
-                "Treasures": ":MGT_Event_Sticker_EgyptTreasures:",
-                "Sticker Boom": ":MGT_Event_StickerBoom~1:",
-                "Roll Match": ":MGT_Event_RollMatch:",
-                "Rent Frenzy": ":MGT_Event_RentFrenzy:",
-                "Mega Heist": ":MGT_Event_MegaHeist:",
-                "Lucky Chance": ":MGT_Event_LuckyChance:",
-                "Landmark Rush": ":MGT_Event_LandmarkRush:",
-                "Wheel Boost": ":MGT_Event_WheelBoost:",
-                "Address Book Connect": ":card_index:",
-                "Facebook Connect": ":facebook:",
-                "Tycoon Racers": ":MGT_Event_TycoonRacers:",
-                "Juggle Sort": ":JuggleSort_MDS:"
-            };
-            return eventEmojis[eventName] || "";
+            // Get emoji from Firebase data
+            return eventsData[eventName] || "";
         }
 
         function updatePreview() {
@@ -403,6 +580,9 @@ ${formattedClipboardText}
             const currentDate = new Date().toISOString().split('T')[0];
             document.getElementById('global-date').value = currentDate;
             console.log(`Global date set to: ${formatDateToMD(currentDate)}`); // Log the formatted date
+
+            // Load events from Firebase
+            loadEvents();
 
             loadDataFromLocalStorage(); // Load data from local storage
         });
