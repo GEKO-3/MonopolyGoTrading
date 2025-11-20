@@ -71,18 +71,23 @@ export function initializeDefaultEvents() {
     { name: "Juggle Sort", emoji: ":JuggleSort_MDS:" }
   ];
 
-  const eventsRef = ref(database, 'events');
-  onValue(eventsRef, (snapshot) => {
-    if (!snapshot.exists()) {
-      // Only initialize if no events exist
-      defaultEvents.forEach(event => {
-        const newEventRef = push(eventsRef);
-        set(newEventRef, {
-          name: event.name,
-          emoji: event.emoji,
-          timestamp: Date.now()
+  return new Promise((resolve) => {
+    const eventsRef = ref(database, 'events');
+    onValue(eventsRef, (snapshot) => {
+      if (!snapshot.exists()) {
+        // Only initialize if no events exist
+        const promises = defaultEvents.map(event => {
+          const newEventRef = push(eventsRef);
+          return set(newEventRef, {
+            name: event.name,
+            emoji: event.emoji,
+            timestamp: Date.now()
+          });
         });
-      });
-    }
-  }, { onlyOnce: true });
+        Promise.all(promises).then(resolve);
+      } else {
+        resolve();
+      }
+    }, { onlyOnce: true });
+  });
 }

@@ -264,11 +264,10 @@
         // Global variable to store events with emojis
         let eventsData = {};
 
-        // Initialize Firebase events on page load
-        initializeDefaultEvents();
-
         // Load events from Firebase and populate datalist
-        function loadEvents() {
+        async function loadEvents() {
+            // Initialize default events first if needed
+            await initializeDefaultEvents();
             loadEventsFromFirebase((events) => {
                 const datalist = document.getElementById('event-suggestions');
                 datalist.innerHTML = ''; // Clear existing options
@@ -366,7 +365,7 @@
             }
         };
 
-        function addRow() {
+        window.addRow = function() {
             const container = document.getElementById('input-container');
             const newRow = document.createElement('div');
             const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
@@ -402,9 +401,9 @@
             container.appendChild(newRow);
             updatePreview();
             saveDataToLocalStorage(); // Save data after adding a new row
-        }
+        };
 
-        function copyToClipboard() {
+        window.copyToClipboard = function() {
             const previewWindow = document.getElementById('preview-window');
             const clipboardText = previewWindow.value;
 
@@ -430,14 +429,14 @@ ${formattedClipboardText}
             navigator.clipboard.writeText(wrappedText).catch(err => {
                 console.error('Failed to copy:', err); // Log error instead of showing alert
             });
-        }
+        };
 
         function getEventEmoji(eventName) {
             // Get emoji from Firebase data
             return eventsData[eventName] || "";
         }
 
-        function updatePreview() {
+        window.updatePreview = function() {
             const container = document.getElementById('input-container');
             const rows = container.querySelectorAll('.input-row');
             let previewText = '';
@@ -472,9 +471,9 @@ ${formattedClipboardText}
 
             const previewWindow = document.getElementById('preview-window');
             previewWindow.value = previewText; // Update the preview window
-        }
+        };
 
-        function saveDataToLocalStorage() {
+        window.saveDataToLocalStorage = function() {
             const container = document.getElementById('input-container');
             const rows = container.querySelectorAll('.input-row');
             const data = [];
@@ -488,7 +487,7 @@ ${formattedClipboardText}
             const currentDate = new Date().toISOString().split('T')[0];
             localStorage.setItem('eventData', JSON.stringify(data));
             localStorage.setItem('lastSavedDate', currentDate);
-        }
+        };
 
         function loadDataFromLocalStorage() {
             const savedDate = localStorage.getItem('lastSavedDate');
@@ -542,7 +541,7 @@ ${formattedClipboardText}
             updatePreview();
         }
 
-        function resetForm() {
+        window.resetForm = function() {
             // Clear all rows
             const container = document.getElementById('input-container');
             container.innerHTML = '';
@@ -560,19 +559,19 @@ ${formattedClipboardText}
 
             // Update the preview
             updatePreview();
-        }
+        };
 
         function formatDateToMD(dateString) {
             const [year, month, day] = dateString.split('-');
             return `${parseInt(month)}/${parseInt(day)}`; // Convert to M/D format
         }
 
-        function onGlobalDateChange() {
+        window.onGlobalDateChange = function() {
             const globalDate = document.getElementById('global-date').value;
             const formattedDate = formatDateToMD(globalDate);
             console.log(`Global date changed to: ${formattedDate}`); // Log the formatted date
             // You can add additional logic here if needed.
-        }
+        };
 
         // Load data from local storage on page load and set the global date to the current date in M/D format
         document.addEventListener('DOMContentLoaded', () => {
