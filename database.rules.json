@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "events": {
+      ".read": true,
+      ".write": "auth != null",
+      "$eventId": {
+        ".validate": "newData.hasChildren(['name', 'timestamp']) && newData.child('name').isString() && newData.child('timestamp').isNumber()",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+        "emoji": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "timestamp": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
